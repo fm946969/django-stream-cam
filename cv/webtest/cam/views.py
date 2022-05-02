@@ -1,10 +1,12 @@
 from contextlib import nullcontext
+from django.views.decorators import gzip
 from django.shortcuts import render
 from django.http.response import StreamingHttpResponse
 from .models import VideoCam
 
 # Create your views here.
 cam = None
+#@gzip.gzip_page
 def index(request):
     print(f'this is index {type(request) = }')
     return render(request, 'index.html',{'hi':'wow i am here'})
