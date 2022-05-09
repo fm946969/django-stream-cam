@@ -25,19 +25,24 @@ SECRET_KEY = 'django-insecure-v7!_id(127gt0c2lubif6^ub*9d&!facs651&e2o-szppx$_f+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.1.2',
+    '127.0.0.1',
+    'queenpigeon.dev',
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'cam.apps.CamConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cam.apps.CamConfig'
 ]
 
 MIDDLEWARE = [
@@ -69,8 +74,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'webtest.wsgi.application'
-
-
+ASGI_APPLICATION = 'webtest.asgi.application'
+CHANNEL_LAYERS = {
+    # 'default': {
+    #     'BACKEND': 'channels_redis.core.RedisChannelLayer',
+    #     'CONFIG': {
+    #         "hosts": [('127.0.0.1', 6379)],
+    #     },
+    # },
+}
+STREAM_SOCKET_GROUP_NAME = 'broadcast'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 

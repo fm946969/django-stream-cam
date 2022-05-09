@@ -1,7 +1,76 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <script>
+
+            function toggle_video_feed(){
+                keep_fetch_vid=!keep_fetch_vid;
+                if(keep_fetch_vid){
+                    setTimeout(() => {
+                        //console.log('vid?->')
+                        ws.send(JSON.stringify({
+                            'type': 'vid?'
+                        }));
+                    }, 40);
+                }
+            }
+        </script>
+    </head>
     <body>
-        <img src="{% url 'video_feed' %}">
+        <img id="cam"/>
+        <input type="button" onclick="toggle_video_feed()" value="Stop!"/>
         <p>{{hi}}</p>
+        <script>
+            function setup_socket(socket){
+                function key_down_handler(e){
+                        msg = JSON.stringify({
+                            'type': 'key_down',
+                            'key_code': e.keyCode
+                        });
+                        console.log(msg)
+                        socket.send(msg);
+                }
+                function key_up_handler(e){
+                        msg = JSON.stringify({
+                            'type': 'key_up',
+                            'key_code': e.keyCode
+                        });
+                        console.log(msg)
+                        socket.send(msg);
+                }
+                socket.addEventListener('open', (event) => {
+                    keep_fetch_vid = true;
+                    socket.addEventListener('message', function (event) {
+                        reply = JSON.parse(event.data)
+
+                        if(reply.type == 'cam'){
+                            document.getElementById('cam').src = 'data:image/jpeg;charset=utf-8;base64,' + reply.cam
+                            if(keep_fetch_vid){
+                                setTimeout(() => {
+                                    //console.log('vid?->')
+                                    socket.send(JSON.stringify({
+                                        'type': 'vid?'
+                                    }));
+                                }, 50);
+                            }
+                            return;
+                        }
+                        console.log('Message from server ', reply.type);
+                    });
+
+                    socket.addEventListener('close', (event) => {
+                        console.log('The connection has been closed.');
+                    });
+                
+                    document.body.onkeyup = key_up_handler;
+                    document.body.onkeydown = key_down_handler;
+                    socket.send(JSON.stringify({'type': 'vid?'}));
+                });
+
+            };
+            
+            ws = new WebSocket(`ws://${window.location.host}/ws/cam/`)
+            setup_socket(ws);
+        </script>
     </body>
 </html>
